@@ -1,4 +1,4 @@
-const readline = require('readline');
+const inquirer = require('inquirer');
 
 const stack = {};
 
@@ -8,13 +8,20 @@ exports.builder = {
 
 }
 exports.handler = (argv) => {
-    const rl = readline.createInterface(process.stdin, process.stdout, null);
-    rl.setPrompt('spah > ');
-    rl.question("new page name?", (answer) => {
-        console.log('I see.');
+    inquirer.prompt(questions).then(execute);
+}
 
-        close(rl);
-    });
+const questions = [
+    {
+        name: 'pagename',
+        type: 'input',
+        message: 'Enter new page name:',
+        default: 'Index'
+    }
+];
+
+const execute = () => {
+    console.log('thx!');
 }
 
 const close = (instance) => {
