@@ -1,4 +1,5 @@
 const inquirer = require('inquirer');
+const fs = require('fs-extra');
 
 const stack = {};
 
@@ -9,22 +10,36 @@ exports.builder = {
 }
 exports.handler = (argv) => {
     inquirer.prompt(questions).then(execute);
+
 }
 
 const questions = [
     {
-        name: 'pagename',
+        name: 'pageName',
         type: 'input',
         message: 'Enter new page name:',
         default: 'Index'
+    },
+    {
+        name: 'path',
+        type: 'input',
+        message: 'Enter path that new page will be created:',
+        validate: function(value) {
+            try {
+                fs.statSync(value);
+                return true;
+            } catch (err) {
+                if (err.code === 'ENOENT') return `no such directory: ${value}`;
+            }
+        }
+    },
+    {
+        name: 'separateTemplate',
+        type: 'confirm',
+        message: 'Do you want separate a template file ?'
     }
 ];
 
-const execute = () => {
-    console.log('thx!');
+const execute = (answers) => {
+    fs.copy
 }
-
-const close = (instance) => {
-    instance.close();
-    process.stdin.destroy();
-} 
