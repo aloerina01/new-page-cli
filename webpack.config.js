@@ -1,5 +1,4 @@
 var webpack = require('webpack');
-var path = require('path');
 
 module.exports = {
   entry: {
@@ -19,8 +18,13 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.js' ],
+    extensions: ['.js', '.json' ],
   },
   devtool: 'inline-source-map',
-  plugins: []
+  plugins: [],
+  node: {
+    fs: "empty",
+    child_process: "empty",
+    tls: "empty"
+  }
 };
