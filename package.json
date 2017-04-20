@@ -1,0 +1,22 @@
+{
+  "name": "new-page-cli",
+  "version": "1.0.0",
+  "main": "main.js",
+  "repository": "git@github.com:aloerina01/new-page-cli.git",
+  "author": "aloerina01 <kiss_mint27@yahoo.co.jp>",
+  "license": "MIT",
+  "dependencies": {
+    "es6-promise": "^4.1.0",
+    "fs-extra": "^2.1.2",
+    "yargs": "^7.1.0"
+  },
+  "scripts": {
+    "start": "node public/main.js"
+  },
+  "devDependencies": {
+    "babel-core": "^6.24.1",
+    "babel-loader": "^6.4.1",
+    "babel-preset-es2015": "^6.24.1",
+    "webpack": "^2.4.1"
+  }
+}
