@@ -1,4 +1,4 @@
-<template src="./_xxxx.tmpl.html"><template>
+<template__src__></template>
 
 <script>
 import viewMixin from '../../common/views/viewMixin';

@@ -40,15 +40,53 @@ const questions = [
 ];
 
 const execute = (answers) => {
-    const vueTemplate = fs.createReadStream('./src/templates/xxxx.vue');
-    var fileName = answers.fileName;
+    try {
+        createVueFile(answers.fileName, normalize(answers.path), null, null, answers.isSeparate);
+        createHtmlFile(answers.fileName, normalize(answers.path), answers.isSeparate);
+    } catch (err) {
+        console.error(err);
+    }
+
+}
+
+const normalize = (path) => {
+    var _path = path.slice();
+    if (_path.slice(-1) !== '/') {
+        return _path + '/';
+    }
+    return _path;
+}
+
+const createVueFile = (fileName, path, pageTitle, pageName, isSeparate) => {
     if (fileName.indexOf('.vue') <= 0) {
         filename += '.vue';
     }
-    var filePath = answers.path;
-    if (filePath.slice(-1) !== '/') {
-        filePath += '/';
+
+    var w = fs.createWriteStream(`${path}${fileName}`);
+    w.on("error", function (err) {
+        hundleError(err);
+    });
+    w.on("close", function (ex) {
+        // TODO:
+    });
+
+    var r = fs.createReadStream('./src/templates/xxxx.vue');
+    r.on("error", function (err) {
+        hundleError(err);
+    });
+    
+    r.pipe(w);
+}
+
+const createHtmlFile = (fileName, path, isSeparate) => {
+    if (!isSeparate) {
+        return;
     }
-    console.log(`${filePath}${fileName}`);
-    fs.createWriteStream(`${filePath}${fileName}`);
+    var _filename = fileName.replace('.vue', '');
+    fs.createWriteStream(`${path}${_filename}.tmpl.html`);
+}
+
+const hundleError = (err) => {
+    console.log(err);
+    throw new Error(err);
 }
