@@ -10,20 +10,19 @@ exports.builder = {
 }
 exports.handler = (argv) => {
     inquirer.prompt(questions).then(execute);
-
 }
 
 const questions = [
     {
-        name: 'pageName',
+        name: 'fileName',
         type: 'input',
-        message: 'Enter new page name:',
-        default: 'Index'
+        message: 'Enter finename of new page:',
+        default: 'Index.vue'
     },
     {
         name: 'path',
         type: 'input',
-        message: 'Enter path that new page will be created:',
+        message: 'Enter directory path that new page will be created:',
         validate: function(value) {
             try {
                 fs.statSync(value);
@@ -41,5 +40,15 @@ const questions = [
 ];
 
 const execute = (answers) => {
-    fs.copy
+    const vueTemplate = fs.createReadStream('./src/templates/xxxx.vue');
+    var fileName = answers.fileName;
+    if (fileName.indexOf('.vue') <= 0) {
+        filename += '.vue';
+    }
+    var filePath = answers.path;
+    if (filePath.slice(-1) !== '/') {
+        filePath += '/';
+    }
+    console.log(`${filePath}${fileName}`);
+    fs.createWriteStream(`${filePath}${fileName}`);
 }
