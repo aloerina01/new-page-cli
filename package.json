@@ -15,7 +15,8 @@
   "scripts": {
     "spah": "node public/main.js",
     "start": "node public/main.js",
-    "build": "webpack"
+    "build": "webpack",
+    "clear": "rm -r ./dist/*"
   },
   "devDependencies": {
     "babel-core": "^6.24.1",

@@ -90,12 +90,12 @@ const optimize = (answers) => {
 }
 
 const createVueFile = () => {
-    var w = fs.createWriteStream(stack.vueFileName);
+    var w = fs.createWriteStream(`${stack.path}${stack.vueFileName}`);
     w.on("error", function (err) {
         hundleError(err);
     });
     w.on("finish", () => {
-        success(`Create ${stack.vueFileName}`);
+        success(`Create ${stack.path}${stack.vueFileName}`);
     });
 
     var r = fs.createReadStream('./src/templates/Index.vue');
@@ -105,18 +105,32 @@ const createVueFile = () => {
     
     r.pipe(w);
     w.end();
+
+    if (stack.isSeparate) {
+        fs.readFile(`${stack.path}${stack.vueFileName}`, 'utf8', (err, vueFile) => {
+            if (err) {
+                return error(err);
+            }
+            var replaced = vueFile.replace(/__src__/, `${stack.path}${stack.templateFileName}`);
+            fs.writeFile(`${stack.path}${stack.vueFileName}`, replaced, 'utf8', (err) => {
+                if (err) {
+                    return error(err);
+                }
+            });
+        });
+    }
 }
 
 const createHtmlFile = () => {
     if (!stack.isSeparate) {
         return;
     }
-    var w = fs.createWriteStream(stack.templateFileName);
+    var w = fs.createWriteStream(`${stack.path}${stack.templateFileName}`);
     w.on("error", function (err) {
         hundleError(err);
     });
     w.on("finish", () => {
-        success(`Create ${stack.templateFileName}`);
+        success(`Create ${stack.path}${stack.templateFileName}`);
     });
     w.end();
 }
