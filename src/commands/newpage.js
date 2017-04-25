@@ -1,5 +1,6 @@
 const inquirer = require('inquirer');
 const fs = require('fs-extra');
+const chalk = require('chalk');
 
 const stack = {};
 
@@ -18,6 +19,12 @@ const questions = [
         type: 'input',
         message: 'Enter finename of new page:',
         default: 'Index.vue'
+    },
+    {
+        name: 'viewTitle',
+        type: 'input',
+        message: 'Enter page title (metadata) of new page:',
+        default: ''
     },
     {
         name: 'path',
@@ -39,54 +46,89 @@ const questions = [
     }
 ];
 
-const execute = (answers) => {
+const execute = (answers) => {    
+    console.log();
     try {
-        createVueFile(answers.fileName, normalize(answers.path), null, null, answers.isSeparate);
-        createHtmlFile(answers.fileName, normalize(answers.path), answers.isSeparate);
+        optimize(answers);
+        createVueFile();
+        createHtmlFile();
     } catch (err) {
         console.error(err);
+    } finally {
+        console.log();
     }
 
 }
 
-const normalize = (path) => {
-    var _path = path.slice();
-    if (_path.slice(-1) !== '/') {
-        return _path + '/';
+const optimize = (answers) => {
+    // path
+    if (answers.path.slice(-1) !== '/') {
+        stack.path = answers.path + '/';
+    } else {
+        stack.path = answers.path;
     }
-    return _path;
+
+    // vueFileName
+    var vueFileName = answers.fileName;
+    if (vueFileName.indexOf('.vue') <= 0) {
+        vueFileName += '.vue';
+    }
+    stack.vueFileName = vueFileName;
+
+    // templateFileName
+    if (answers.separateTemplate) {
+        var templateFileName = answers.fileName.replace(/\.vue/, '').toLowerCase();
+        templateFileName = `_${templateFileName}.tmpl.html`;
+        stack.templateFileName = templateFileName;
+    }
+
+    // flag of separating template
+    stack.isSeparate = answers.separateTemplate;
+
+    // VIEW_TITLE
+    stack.viewTitle = answers.viewTitle;
 }
 
-const createVueFile = (fileName, path, pageTitle, pageName, isSeparate) => {
-    if (fileName.indexOf('.vue') <= 0) {
-        filename += '.vue';
-    }
-
-    var w = fs.createWriteStream(`${path}${fileName}`);
+const createVueFile = () => {
+    var w = fs.createWriteStream(stack.vueFileName);
     w.on("error", function (err) {
         hundleError(err);
     });
-    w.on("close", function (ex) {
-        // TODO:
+    w.on("finish", () => {
+        success(`Create ${stack.vueFileName}`);
     });
 
-    var r = fs.createReadStream('./src/templates/xxxx.vue');
-    r.on("error", function (err) {
+    var r = fs.createReadStream('./src/templates/Index.vue');
+    r.on("error", (err) => {
         hundleError(err);
     });
     
     r.pipe(w);
+    w.end();
 }
 
-const createHtmlFile = (fileName, path, isSeparate) => {
-    if (!isSeparate) {
+const createHtmlFile = () => {
+    if (!stack.isSeparate) {
         return;
     }
-    var _filename = fileName.replace('.vue', '');
-    fs.createWriteStream(`${path}${_filename}.tmpl.html`);
+    var w = fs.createWriteStream(stack.templateFileName);
+    w.on("error", function (err) {
+        hundleError(err);
+    });
+    w.on("finish", () => {
+        success(`Create ${stack.templateFileName}`);
+    });
+    w.end();
 }
 
 const hundleError = (err) => {
-    console.log(err);
     throw new Error(err);
+}
+
+const success = (message) => {
+    console.log(`${chalk.green('✓ SUCCESS  ')}${message}`);
+}
+const error = (message) => {
+    console.log(`${chalk.red('❌ FAILED')}`);
+    console.log(message);
 }
