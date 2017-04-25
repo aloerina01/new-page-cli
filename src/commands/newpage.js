@@ -24,12 +24,23 @@ const questions = [
         name: 'viewTitle',
         type: 'input',
         message: 'Enter page title (metadata) of new page:',
-        default: ''
+        default: 'example-page',
+    },
+    {
+        name: 'viewUniqueName',
+        type: 'input',
+        message: 'Enter unique key of new page:',
+        default: 'unique-page-name',
+        validate: function(value) {
+            // TODO: 一意かどうかの判定
+            return true;
+        }
     },
     {
         name: 'path',
         type: 'input',
         message: 'Enter directory path that new page will be created:',
+        default: './',
         validate: function(value) {
             try {
                 fs.statSync(value);
@@ -48,16 +59,9 @@ const questions = [
 
 const execute = (answers) => {    
     console.log();
-    try {
-        optimize(answers);
-        createVueFile();
-        createHtmlFile();
-    } catch (err) {
-        console.error(err);
-    } finally {
-        console.log();
-    }
-
+    optimize(answers);
+    createVueFile();
+    createHtmlFile();
 }
 
 const optimize = (answers) => {
@@ -94,31 +98,24 @@ const createVueFile = () => {
     w.on("error", function (err) {
         hundleError(err);
     });
-    w.on("finish", () => {
-        success(`Create ${stack.path}${stack.vueFileName}`);
-    });
 
-    var r = fs.createReadStream('./src/templates/Index.vue');
-    r.on("error", (err) => {
-        hundleError(err);
-    });
-    
-    r.pipe(w);
-    w.end();
-
-    if (stack.isSeparate) {
-        fs.readFile(`${stack.path}${stack.vueFileName}`, 'utf8', (err, vueFile) => {
+    fs.readFile('./src/templates/Index.vue', 'utf8', (err, template) => {
+        if (err) {
+            return error(err);
+        }
+        var replaced = template.replace(/__viewtitle__/, stack.viewTitle);
+        if (stack.isSeparate) {
+            replaced = replaced.replace(/__src__/, ` src="./${stack.templateFileName}"`);
+        } else {
+            replaced = replaced.replace(/__src__/, '');
+        }
+        w.write(replaced, 'utf8', (err) => {
             if (err) {
                 return error(err);
             }
-            var replaced = vueFile.replace(/__src__/, `${stack.path}${stack.templateFileName}`);
-            fs.writeFile(`${stack.path}${stack.vueFileName}`, replaced, 'utf8', (err) => {
-                if (err) {
-                    return error(err);
-                }
-            });
+            success(`Create ${stack.path}${stack.vueFileName}`);
         });
-    }
+    });
 }
 
 const createHtmlFile = () => {
@@ -144,5 +141,5 @@ const success = (message) => {
 }
 const error = (message) => {
     console.log(`${chalk.red('❌ FAILED')}`);
-    console.log(message);
+    console.log(chalk.red(message));
 }

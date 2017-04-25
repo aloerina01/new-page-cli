@@ -3,7 +3,7 @@
 <script>
 import viewMixin from '../../common/views/viewMixin';
 
-const VIEW_TITLE = '';
+const VIEW_TITLE = '__viewtitle__';
 const VIEW_UNIQUE_NAME = '';
 
 export default {

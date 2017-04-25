@@ -13,8 +13,8 @@
     "yargs": "^7.1.0"
   },
   "scripts": {
-    "spah": "node public/main.js",
-    "start": "node public/main.js",
+    "spah": "./spah.js newpage",
+    "start": "npm run clear | ./spah.js newpage",
     "build": "webpack",
     "clear": "rm -r ./dist/*"
   },
